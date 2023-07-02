@@ -18,7 +18,6 @@ exports.handleSms = onRequest(handleSms);
 exports.checkNewMessagesQueue = onSchedule('every day 16:00', checkNewMessagesQueue);
 exports.sendDailyLoveText = onSchedule('every day 20:00', sendDailyLoveText);
 
-
 async function handleSms(request, response) {
     if(isDev) {
         console.log('request.body: ' + JSON.stringify(request.body, null, 4));
