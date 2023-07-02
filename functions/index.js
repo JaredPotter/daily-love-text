@@ -61,20 +61,19 @@ async function sendDailyLoveText(context) {
     const size = newMessagesSnapshot.size;
     const randomIndex = Math.floor(Math.random() * size);
     const randomMessageDoc = newMessagesSnapshot.docs.at(randomIndex);
-    const message = randomMessageDoc.data().message;
-    await sendMessage(message, "+18015747900", twilioPhoneNumber);
 
-    await firestore.collection('new_messages').doc(randomMessageDoc.id).delete();
-    await firestore.collection('sent_messages').add(randomMessageDoc);
+    if(randomMessageDoc) {
+        const messageDocData = randomMessageDoc.data();
+        const message = messageDocData.message;
+        await sendMessage(message, "+18015747900", twilioPhoneNumber);
+    
+        await firestore.collection('new_messages').doc(randomMessageDoc.id).delete();
+        messageDocData.sentAt = firebaseAdmin.firestore.FieldValue.serverTimestamp(); 
+        await firestore.collection('sent_messages').add(messageDocData);
+    } else {
+        await sendMessage("Error: No Message in Queue.", "+18015747900", twilioPhoneNumber);
+    }
 }
-
-// TODO: Create 2 cron jobs
-// 1. 4 hours before daily message - a check for the number of new 
-//    messages in the queue. If less than 10 messages, notify admin.
-//    
-// 2. on the daily message time - randomly select a message from the
-//    new messages queue and send one. Then move to message to sent
-//    messages queue.
 
 async function sendMessage(message, to, from) {
     if(isDev) {
@@ -94,15 +93,6 @@ async function sendMessage(message, to, from) {
     }
 }
 
-function getUtc24HourTime(addHours = 0, addMinutes = 0) {
-    const now = new Date();
-
-    const hours = (now.getUTCHours() + addHours).toString().padStart(2, '0') ;
-    const minutes = (now.getUTCMinutes() + addMinutes).toString().padStart(2, '0');
-    const time = `${hours}:${minutes}`;
-
-    return time;
-}
 
 if(isDev) {
     console.log('Running local dev...');
@@ -111,8 +101,8 @@ if(isDev) {
         // const request = { body: { From: '+18015747900', Body: 'Hello from Firebase' } };
         // handleSms(request, null)
 
-        // console.log(getUtc24HourTime(0, 0, 0));
         // await checkNewMessagesQueue();
-        await sendDailyLoveText();
+
+        // await sendDailyLoveText();
     })();
 }
