@@ -15,11 +15,6 @@ const client = twilio(accountSid, authToken);
 const isDev = process.argv[2] === 'dev';
 
 exports.handleSms = onRequest(handleSms);
-
-
-
-// exports.scheduledFunction1 = onSchedule('every day 04:05', checkNewMessagesQueue);
-// exports.checkNewMessagesQueue = onSchedule('every day 05:35', checkNewMessagesQueue);
 exports.checkNewMessagesQueue = onSchedule('every day 16:00', checkNewMessagesQueue);
 exports.sendDailyLoveText = onSchedule('every day 20:00', sendDailyLoveText);
 
