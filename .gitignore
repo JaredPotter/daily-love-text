@@ -1,0 +1,10 @@
+.DS_Store
+
+node_modules
+
+.env
+
+
+daily-love-text-firebase-adminsdk-b45qq-b42e3140ba.json
+
+firebase-debug.log
